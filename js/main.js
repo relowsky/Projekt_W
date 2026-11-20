@@ -615,9 +615,10 @@ function renderTemplates() {
     dim.className = "tpl-dim";
     dim.textContent = `${tpl.L} × ${tpl.W} × ${tpl.H} mm`;
 
-    card.append(canvas, name, dim);
-    card.addEventListener("click", () => applyTemplate(tpl));
-    templatesGrid.appendChild(card);
+    const thumb = document.createElement("div");
+thumb.className = "tpl-thumb";
+thumb.appendChild(canvas);
+card.append(thumb, name, dim);
   });
 }
 

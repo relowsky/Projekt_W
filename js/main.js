@@ -20,11 +20,6 @@ const finishMatteBtn = document.getElementById("finishMatte");
 const finishGlossyBtn = document.getElementById("finishGlossy");
 const viewport = document.getElementById("viewport");
 
-const langSelect = document.getElementById("langSelect");
-const currencySelect = document.getElementById("currencySelect");
-const mainEl = document.getElementById("main");
-const templatesGrid = document.getElementById("templatesGrid");
-
 const steps = [...document.querySelectorAll(".step")].filter((s) =>
   s.querySelector("b")
 );
@@ -33,179 +28,10 @@ const steps = [...document.querySelectorAll(".step")].filter((s) =>
 const materialRates = [48, 56, 40];
 const fixedSetupCost = 2.0;
 const glossyExtraCharge = 0.1;
-
-// Bazowa cena liczona w USD, przeliczana na wybraną walutę
-const currencyRates = { PLN: 4.0, EUR: 0.92, USD: 1 };
+const usdToPln = 4.0; // kurs: 1 USD
 
 let currentFinish = "matte";
 let uploadedImageUrl = null;
-let currentLang = localStorage.getItem("lang") || "pl";
-let currentCurrency = localStorage.getItem("currency") || "PLN";
-
-// ===== 2b. Tłumaczenia =====
-const locales = { pl: "pl-PL", en: "en-GB", de: "de-DE" };
-
-const i18n = {
-  pl: {
-    language: "Język",
-    currency: "Waluta",
-    profile: "Profil (Klienta)",
-    tabBox: "Pudełko",
-    tabGraphics: "Grafika",
-    tabTemplates: "Szablony",
-    tabMaterials: "Materiały",
-    tabOrders: "Zamówienia",
-    tabSettings: "Ustawienia",
-    autoRotate: "Auto-Obrót",
-    resetView: "Reset Widoku",
-    h1: "1. Wymiary Pudełka (zewnętrzne)",
-    length: "Długość (mm)",
-    width: "Szerokość (mm)",
-    depth: "Głębokość (mm)",
-    material: "Materiał",
-    mat0: "Tektura Fala E (Cienka)",
-    mat1: "Tektura Fala B (Gruba)",
-    mat2: "Papier Kraft (Brązowy)",
-    matte: "Matowe",
-    glossy: "Błyszczące",
-    h2: "2. Projekt i Grafika",
-    upload: "⬆ Wgraj Własną Grafikę",
-    download: "💾 Pobierz Siatkę UV (.png)",
-    uvPreview: "Podgląd Siatki UV w panelu",
-    faceTop: "Góra",
-    faceLeft: "Bok L",
-    faceFront: "Przód",
-    faceRight: "Bok P",
-    faceBack: "Tył",
-    faceBottom: "Spód",
-    h3: "3. Podsumowanie i Zamówienie",
-    qty: "Ilość (sztuk)",
-    unitNet: "Cena jedn. (netto)",
-    totalNet: "Razem (netto)",
-    addToCart: "DODAJ DO KOSZYKA",
-    pcs: "szt.",
-    step1: "Wymiary",
-    step2: "Projekt",
-    step3: "Podgląd 3D",
-    step4: "Zamówienie",
-    help: "? Pomoc",
-  },
-  en: {
-    language: "Language",
-    currency: "Currency",
-    profile: "Profile (Customer)",
-    tabBox: "Box",
-    tabGraphics: "Artwork",
-    tabTemplates: "Templates",
-    tabMaterials: "Materials",
-    tabOrders: "Orders",
-    tabSettings: "Settings",
-    autoRotate: "Auto-Rotate",
-    resetView: "Reset View",
-    h1: "1. Box Dimensions (external)",
-    length: "Length (mm)",
-    width: "Width (mm)",
-    depth: "Depth (mm)",
-    material: "Material",
-    mat0: "Corrugated E-Flute (Thin)",
-    mat1: "Corrugated B-Flute (Thick)",
-    mat2: "Kraft Paper (Brown)",
-    matte: "Matte",
-    glossy: "Glossy",
-    h2: "2. Design & Artwork",
-    upload: "⬆ Upload Your Artwork",
-    download: "💾 Download UV Template (.png)",
-    uvPreview: "UV Template Preview",
-    faceTop: "Top",
-    faceLeft: "Left",
-    faceFront: "Front",
-    faceRight: "Right",
-    faceBack: "Back",
-    faceBottom: "Bottom",
-    h3: "3. Summary & Order",
-    qty: "Quantity (pcs)",
-    unitNet: "Unit price (net)",
-    totalNet: "Total (net)",
-    addToCart: "ADD TO CART",
-    pcs: "pc.",
-    step1: "Dimensions",
-    step2: "Design",
-    step3: "3D Preview",
-    step4: "Order",
-    help: "? Help",
-  },
-  de: {
-    language: "Sprache",
-    currency: "Währung",
-    profile: "Profil (Kunde)",
-    tabBox: "Karton",
-    tabGraphics: "Grafik",
-    tabTemplates: "Vorlagen",
-    tabMaterials: "Materialien",
-    tabOrders: "Bestellungen",
-    tabSettings: "Einstellungen",
-    autoRotate: "Auto-Drehung",
-    resetView: "Ansicht zurücksetzen",
-    h1: "1. Kartonmaße (außen)",
-    length: "Länge (mm)",
-    width: "Breite (mm)",
-    depth: "Tiefe (mm)",
-    material: "Material",
-    mat0: "Wellpappe E-Welle (Dünn)",
-    mat1: "Wellpappe B-Welle (Dick)",
-    mat2: "Kraftpapier (Braun)",
-    matte: "Matt",
-    glossy: "Glänzend",
-    h2: "2. Design & Grafik",
-    upload: "⬆ Eigene Grafik hochladen",
-    download: "💾 UV-Netz herunterladen (.png)",
-    uvPreview: "UV-Netz Vorschau",
-    faceTop: "Oben",
-    faceLeft: "Links",
-    faceFront: "Vorne",
-    faceRight: "Rechts",
-    faceBack: "Hinten",
-    faceBottom: "Unten",
-    h3: "3. Zusammenfassung & Bestellung",
-    qty: "Menge (Stück)",
-    unitNet: "Stückpreis (netto)",
-    totalNet: "Gesamt (netto)",
-    addToCart: "IN DEN WARENKORB",
-    pcs: "Stk.",
-    step1: "Maße",
-    step2: "Design",
-    step3: "3D-Vorschau",
-    step4: "Bestellung",
-    help: "? Hilfe",
-  },
-};
-
-// Szablony pudełek (wymiary w mm)
-const templates = [
-  { L: 320, W: 230, H: 100, name: { pl: "Standard", en: "Standard", de: "Standard" } },
-  { L: 200, W: 150, H: 50, name: { pl: "Małe płaskie", en: "Small flat", de: "Klein flach" } },
-  { L: 300, W: 300, H: 100, name: { pl: "Kwadratowe", en: "Square", de: "Quadratisch" } },
-  { L: 400, W: 300, H: 150, name: { pl: "Wysyłkowe M", en: "Shipping M", de: "Versand M" } },
-  { L: 500, W: 350, H: 200, name: { pl: "Wysyłkowe L", en: "Shipping L", de: "Versand L" } },
-  { L: 250, W: 250, H: 250, name: { pl: "Sześcian", en: "Cube", de: "Würfel" } },
-  { L: 150, W: 100, H: 60, name: { pl: "Na kosmetyki", en: "Cosmetics", de: "Kosmetik" } },
-  { L: 350, W: 250, H: 80, name: { pl: "Na odzież", en: "Apparel", de: "Bekleidung" } },
-  { L: 220, W: 160, H: 40, name: { pl: "Na książki", en: "Books", de: "Bücher" } },
-];
-
-const t = (key) => i18n[currentLang][key] ?? key;
-
-function applyLanguage() {
-  document.documentElement.lang = currentLang;
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    el.textContent = t(el.dataset.i18n);
-  });
-  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
-    el.title = t(el.dataset.i18nTitle);
-  });
-  renderTemplates();
-  calculatePrice();
-}
 
 // ===== 3. Scena 3D =====
 const scene = new THREE.Scene();
@@ -270,7 +96,9 @@ function getDims() {
   };
 }
 
-function computeNetLayout(L, W, H) {
+// Prostokąty ścianek w mm: [x, y, szerokość, wysokość]
+function getNetLayout() {
+  const { L, W, H } = getDims();
   return {
     L,
     W,
@@ -288,11 +116,6 @@ function computeNetLayout(L, W, H) {
   };
 }
 
-function getNetLayout() {
-  const { L, W, H } = getDims();
-  return computeNetLayout(L, W, H);
-}
-
 // Kolejność ścian w BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
 const faceOrder = ["right", "left", "top", "bottom", "front", "back"];
 
@@ -303,8 +126,8 @@ function updateBoxUV() {
   faceOrder.forEach((name, f) => {
     const [x, y, w, h] = rects[name];
     for (let k = 0; k < 4; k++) {
-      const ou = k % 2;
-      const top = k < 2;
+      const ou = k % 2; // 0 = lewo, 1 = prawo
+      const top = k < 2; // pierwsze dwa wierzchołki = góra ścianki
       const u = (x + ou * w) / TW;
       const v = 1 - (y + (top ? 0 : h)) / TH;
       uv.setXY(f * 4 + k, u, v);
@@ -400,15 +223,15 @@ function calculatePrice() {
   else if (qty >= 500) discount = 0.08;
   else if (qty >= 100) discount = 0.03;
   unit *= 1 - discount;
+  const unitPln = unit * usdToPln;
+  const fmt = (n) =>
+    n.toLocaleString("pl-PL", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
-  const unitConverted = unit * currencyRates[currentCurrency];
-  const fmt = new Intl.NumberFormat(locales[currentLang], {
-    style: "currency",
-    currency: currentCurrency,
-  });
-
-  unitPriceEl.textContent = `${fmt.format(unitConverted)} / ${t("pcs")}`;
-  totalPriceEl.textContent = fmt.format(unitConverted * qty);
+  unitPriceEl.textContent = fmt(unitPln) + " zł / szt.";
+  totalPriceEl.textContent = fmt(unitPln * qty) + " zł";
 }
 
 // ===== 9. Miniatura UV w panelu =====
@@ -487,15 +310,15 @@ steps.forEach((step) => {
 });
 
 // ===== 13. Reakcja na zmiany pól =====
-function refreshAll() {
-  calculatePrice();
-  updateUVPreviewLayout();
-  updateBoxScale();
-  applyUploadedImageToUVPreview();
-}
-
 [lengthInput, widthInput, depthInput, materialSelect, qtyInput].forEach(
-  (input) => input.addEventListener("input", refreshAll)
+  (input) => {
+    input.addEventListener("input", () => {
+      calculatePrice();
+      updateUVPreviewLayout();
+      updateBoxScale();
+      applyUploadedImageToUVPreview();
+    });
+  }
 );
 
 // ===== 14. Pobieranie szablonu UV (PNG) =====
@@ -516,12 +339,12 @@ function downloadUV() {
   ctx.setLineDash([25, 15]);
 
   const labels = {
-    top: t("faceTop"),
-    left: t("faceLeft"),
-    front: t("faceFront"),
-    right: t("faceRight"),
-    back: t("faceBack"),
-    bottom: t("faceBottom"),
+    top: "GÓRA",
+    left: "BOK L",
+    front: "PRZÓD",
+    right: "BOK P",
+    back: "TYŁ",
+    bottom: "SPÓD",
   };
 
   ctx.fillStyle = "#9ca3af";
@@ -531,11 +354,7 @@ function downloadUV() {
 
   for (const [name, [x, y, w, h]] of Object.entries(rects)) {
     ctx.strokeRect(x * scale, y * scale, w * scale, h * scale);
-    ctx.fillText(
-      labels[name].toUpperCase(),
-      (x + w / 2) * scale,
-      (y + h / 2) * scale
-    );
+    ctx.fillText(labels[name], (x + w / 2) * scale, (y + h / 2) * scale);
   }
 
   const link = document.createElement("a");
@@ -545,108 +364,8 @@ function downloadUV() {
 }
 downloadBtn.addEventListener("click", downloadUV);
 
-// ===== 15. Zakładki (sidebar) =====
-const tabButtons = [...document.querySelectorAll(".sidebar button")];
-
-function switchTab(tab) {
-  tabButtons.forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
-  mainEl.classList.toggle("templates-mode", tab === "templates");
-}
-
-tabButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const tab = btn.dataset.tab;
-    if (tab === "box" || tab === "templates") switchTab(tab);
-  });
-});
-
-// ===== 16. Szablony =====
-function drawNet(canvas, L, W, H) {
-  const { TW, TH, rects } = computeNetLayout(L, W, H);
-  const pad = 14;
-  const cw = 480;
-  const scale = (cw - pad * 2) / TW;
-  canvas.width = cw;
-  canvas.height = Math.round(TH * scale + pad * 2);
-  const ctx = canvas.getContext("2d");
-
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = "#e11d48";
-  ctx.lineWidth = 2;
-  ctx.setLineDash([8, 5]);
-  ctx.fillStyle = "#9ca3af";
-  ctx.font = "14px sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  const names = {
-    top: "faceTop",
-    left: "faceLeft",
-    front: "faceFront",
-    right: "faceRight",
-    back: "faceBack",
-    bottom: "faceBottom",
-  };
-
-  for (const [name, [x, y, w, h]] of Object.entries(rects)) {
-    const px = pad + x * scale;
-    const py = pad + y * scale;
-    ctx.strokeRect(px, py, w * scale, h * scale);
-    ctx.fillText(t(names[name]), px + (w * scale) / 2, py + (h * scale) / 2);
-  }
-}
-
-function renderTemplates() {
-  templatesGrid.innerHTML = "";
-  templates.forEach((tpl) => {
-    const card = document.createElement("button");
-    card.className = "tpl-card";
-    card.type = "button";
-
-    const canvas = document.createElement("canvas");
-    drawNet(canvas, tpl.L, tpl.W, tpl.H);
-
-    const name = document.createElement("div");
-    name.className = "tpl-name";
-    name.textContent = tpl.name[currentLang];
-
-    const dim = document.createElement("div");
-    dim.className = "tpl-dim";
-    dim.textContent = `${tpl.L} × ${tpl.W} × ${tpl.H} mm`;
-
-    const thumb = document.createElement("div");
-    thumb.className = "tpl-thumb";
-    thumb.appendChild(canvas);
-    card.append(thumb, name, dim);
-}
-
-function applyTemplate(tpl) {
-  lengthInput.value = tpl.L;
-  widthInput.value = tpl.W;
-  depthInput.value = tpl.H;
-  refreshAll();
-  switchTab("box");
-}
-
-// ===== 17. Język i waluta =====
-langSelect.value = currentLang;
-currencySelect.value = currentCurrency;
-
-langSelect.addEventListener("change", () => {
-  currentLang = langSelect.value;
-  localStorage.setItem("lang", currentLang);
-  applyLanguage();
-});
-
-currencySelect.addEventListener("change", () => {
-  currentCurrency = currencySelect.value;
-  localStorage.setItem("currency", currentCurrency);
-  calculatePrice();
-});
-
-// ===== 18. Start =====
-applyLanguage();
+// ===== 15. Start =====
+calculatePrice();
 updateUVPreviewLayout();
 updateBoxScale();
 updateMaterialFinish();

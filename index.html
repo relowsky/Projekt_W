@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>PACKFORGE 3D</title>
+
+		<script type="importmap">
+			{
+			"imports": {
+			"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+			"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+			}
+			}
+		</script>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+		<header>
+			<div class="logo">
+				PRINT<span>FORGE</span> 3D
+			</div>
+			<div class="user">👤 Profil (Klienta)</div>
+		</header>
+
+		<div class="main">
+			<nav class="sidebar">
+				<button class="active" title="Pudełko">📦</button>
+				<button title="Grafika">🖼️</button>
+				<button title="Szablony">📐</button>
+				<button title="Materiały">🎨</button>
+				<button title="Zamówienia">🛒</button>
+				<button title="Ustawienia">⚙️</button>
+			</nav>
+
+			<section class="viewer">
+				<div class="viewport" id="viewport">
+					<div class="toolbar-top">
+						<button class="chip" id="btnRotate">🔄 Auto-Obrót</button>
+						<button class="chip" id="btnReset">↺ Reset Widoku</button>
+					</div>
+
+					<div class="toolbar-bottom">
+						<button class="chip active" id="finishMatte">Matowe</button>
+						<button class="chip" id="finishGlossy">Błyszczące</button>
+					</div>
+
+					<div class="zoom">
+						<button class="chip" id="btnPlus">+</button>
+						<button class="chip" id="btnMinus">−</button>
+					</div>
+				</div>
+			</section>
+
+			<aside class="panel">
+				<div class="card">
+					<h3>1. Wymiary Pudełka (zewnętrzne)</h3>
+					<div class="row">
+						<div class="field">
+							<label>Długość (mm)</label>
+							<input type="number" id="boxLength" value="320" min="30" step="10" />
+						</div>
+						<div class="field">
+							<label>Szerokość (mm)</label>
+							<input type="number" id="boxWidth" value="230" min="30" step="10" />
+						</div>
+						<div class="field">
+							<label>Głębokość (mm)</label>
+							<input type="number" id="boxDepth" value="100" min="30" step="10" />
+						</div>
+					</div>
+					<div class="field">
+						<label>Materiał</label>
+						<select id="boxMaterial">
+							<option value="0">Tektura Fala E (Cienka)</option>
+							<option value="1">Tektura Fala B (Gruba)</option>
+							<option value="2">Papier Kraft (Brązowy)</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="card">
+					<h3>2. Projekt i Grafika</h3>
+					<button class="btn" id="btnUpload">⬆ Wgraj Własną Grafikę</button>
+					<button class="btn success" id="btnDownloadUV">
+						💾 Pobierz Siatkę UV (.png)
+					</button>
+
+					<h3 style="margin-top: 14px; font-size: 13px; color: #9aa3b5">
+						Podgląd Siatki UV w panelu
+					</h3>
+					<div class="uv" id="uvPreview">
+						<div class="empty"></div>
+						<div class="face-top">Góra</div>
+						<div class="empty"></div>
+						<div class="empty"></div>
+
+						<div class="face-ls">Bok L</div>
+						<div class="face-front">Przód</div>
+						<div class="face-rs">Bok P</div>
+						<div class="face-back">Tył</div>
+
+						<div class="empty"></div>
+						<div class="face-bottom">Spód</div>
+						<div class="empty"></div>
+						<div class="empty"></div>
+					</div>
+				</div>
+
+				<div class="card">
+					<h3>3. Podsumowanie i Zamówienie</h3>
+					<div class="field">
+						<label>Ilość (sztuk)</label>
+						<input type="number" id="boxQty" value="100" min="1" step="2" />
+					</div>
+					<div class="price-line">
+						<span>Cena jedn. (netto)</span>
+						<span id="unitPrice">13.80 zł / szt.</span>
+					</div>
+					<div class="total">
+						<span>Razem (netto)</span>
+						<span id="totalPrice">6 900.00</span>
+					</div>
+					<button class="btn primary">DODAJ DO KOSZYKA</button>
+				</div>
+			</aside>
+		</div>
+
+		<footer>
+			<div class="steps">
+				<span class="step active">
+					<b>1</b>Wymiary
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>2</b>Projekt
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>3</b>Podgląd 3D
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>4</b>Zamówienie
+				</span>
+			</div>
+			<div class="actions">
+				<button>? Pomoc</button>
+			</div>
+		</footer>
+
+		<script type="module" src="./js/script.js"></script>
+	</body>
+</html>

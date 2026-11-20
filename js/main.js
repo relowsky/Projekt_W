@@ -616,10 +616,9 @@ function renderTemplates() {
     dim.textContent = `${tpl.L} × ${tpl.W} × ${tpl.H} mm`;
 
     const thumb = document.createElement("div");
-thumb.className = "tpl-thumb";
-thumb.appendChild(canvas);
-card.append(thumb, name, dim);
-  });
+    thumb.className = "tpl-thumb";
+    thumb.appendChild(canvas);
+    card.append(thumb, name, dim);
 }
 
 function applyTemplate(tpl) {

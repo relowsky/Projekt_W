@@ -362,7 +362,9 @@ footer {
   display: none;
   flex: 1;
   min-width: 0;
+  min-height: 0;
   padding: 16px;
+  position: relative;
 }
 .templates-mode .viewer {
   display: none;
@@ -375,7 +377,8 @@ footer {
 }
 
 .templates-grid {
-  height: 100%;
+  position: absolute;
+  inset: 16px;
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);

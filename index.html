@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PACKFORGE 3D</title>
+    <title>PRINTVIEWER 3D</title>
 
     <script type="importmap">
       {
@@ -18,30 +18,47 @@
 
   <body>
     <header>
-      <div class="logo">PRINT<span>FORGE</span> 3D</div>
-      <div class="user">👤 Profil (Klienta)</div>
+      <div class="logo">PRINT<span>VIEWER</span> 3D</div>
+      <div class="header-right">
+        <label class="hsel">
+          <span data-i18n="language">Język</span>
+          <select id="langSelect">
+            <option value="pl">PL</option>
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+          </select>
+        </label>
+        <label class="hsel">
+          <span data-i18n="currency">Waluta</span>
+          <select id="currencySelect">
+            <option value="PLN">PLN</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+          </select>
+        </label>
+        <div class="user">👤 <span data-i18n="profile">Profil (Klienta)</span></div>
+      </div>
     </header>
 
-    <div class="main">
+    <div class="main" id="main">
       <nav class="sidebar">
-        <button class="active" title="Pudełko">📦</button>
-        <button title="Grafika">🖼️</button>
-        <button title="Szablony">📐</button>
-        <button title="Materiały">🎨</button>
-        <button title="Zamówienia">🛒</button>
-        <button title="Ustawienia">⚙️</button>
+        <button class="active" data-tab="box" data-i18n-title="tabBox">📦</button>
+        <button data-tab="graphics" data-i18n-title="tabGraphics">🖼️</button>
+        <button data-tab="templates" data-i18n-title="tabTemplates">📐</button>
+        <button data-tab="materials" data-i18n-title="tabMaterials">🎨</button>
+        <button data-tab="orders" data-i18n-title="tabOrders">🛒</button>
+        <button data-tab="settings" data-i18n-title="tabSettings">⚙️</button>
       </nav>
 
-      <section class="viewer">
+      <section class="viewer" id="viewerSection">
         <div class="viewport" id="viewport">
           <div class="toolbar-top">
-            <button class="chip" id="btnRotate">🔄 Auto-Obrót</button>
-            <button class="chip" id="btnReset">↺ Reset Widoku</button>
-          </div>
-
-          <div class="toolbar-bottom">
-            <button class="chip active" id="finishMatte">Matowe</button>
-            <button class="chip" id="finishGlossy">Błyszczące</button>
+            <button class="chip" id="btnRotate">
+              🔄 <span data-i18n="autoRotate">Auto-Obrót</span>
+            </button>
+            <button class="chip" id="btnReset">
+              ↺ <span data-i18n="resetView">Reset Widoku</span>
+            </button>
           </div>
 
           <div class="zoom">
@@ -51,92 +68,112 @@
         </div>
       </section>
 
-      <aside class="panel">
+      <section class="templates" id="templatesSection">
+        <div class="templates-grid" id="templatesGrid"></div>
+      </section>
+
+      <aside class="panel" id="panel">
         <div class="card">
-          <h3>1. Wymiary Pudełka (zewnętrzne)</h3>
+          <h3 data-i18n="h1">1. Wymiary Pudełka (zewnętrzne)</h3>
           <div class="row">
             <div class="field">
-              <label>Długość (mm)</label>
+              <label data-i18n="length">Długość (mm)</label>
               <input type="number" id="boxLength" value="320" min="30" step="10" />
             </div>
             <div class="field">
-              <label>Szerokość (mm)</label>
+              <label data-i18n="width">Szerokość (mm)</label>
               <input type="number" id="boxWidth" value="230" min="30" step="10" />
             </div>
             <div class="field">
-              <label>Głębokość (mm)</label>
+              <label data-i18n="depth">Głębokość (mm)</label>
               <input type="number" id="boxDepth" value="100" min="30" step="10" />
             </div>
           </div>
           <div class="field">
-            <label>Materiał</label>
+            <label data-i18n="material">Materiał</label>
             <select id="boxMaterial">
-              <option value="0">Tektura Fala E (Cienka)</option>
-              <option value="1">Tektura Fala B (Gruba)</option>
-              <option value="2">Papier Kraft (Brązowy)</option>
+              <option value="0" data-i18n="mat0">Tektura Fala E (Cienka)</option>
+              <option value="1" data-i18n="mat1">Tektura Fala B (Gruba)</option>
+              <option value="2" data-i18n="mat2">Papier Kraft (Brązowy)</option>
             </select>
           </div>
         </div>
 
+        <div class="finish-switch">
+          <button class="finish-btn active" id="finishMatte" data-i18n="matte">
+            Matowe
+          </button>
+          <button class="finish-btn" id="finishGlossy" data-i18n="glossy">
+            Błyszczące
+          </button>
+        </div>
+
         <div class="card">
-          <h3>2. Projekt i Grafika</h3>
-          <button class="btn" id="btnUpload">⬆ Wgraj Własną Grafikę</button>
-          <button class="btn success" id="btnDownloadUV">
+          <h3 data-i18n="h2">2. Projekt i Grafika</h3>
+          <button class="btn" id="btnUpload" data-i18n="upload">
+            ⬆ Wgraj Własną Grafikę
+          </button>
+          <button class="btn success" id="btnDownloadUV" data-i18n="download">
             💾 Pobierz Siatkę UV (.png)
           </button>
 
-          <h3 style="margin-top: 14px; font-size: 13px; color: #9aa3b5">
+          <h3
+            style="margin-top: 14px; font-size: 13px; color: #9aa3b5"
+            data-i18n="uvPreview"
+          >
             Podgląd Siatki UV w panelu
           </h3>
           <div class="uv" id="uvPreview">
             <div class="empty"></div>
-            <div class="face-top">Góra</div>
+            <div class="face-top" data-i18n="faceTop">Góra</div>
             <div class="empty"></div>
             <div class="empty"></div>
 
-            <div class="face-ls">Bok L</div>
-            <div class="face-front">Przód</div>
-            <div class="face-rs">Bok P</div>
-            <div class="face-back">Tył</div>
+            <div class="face-ls" data-i18n="faceLeft">Bok L</div>
+            <div class="face-front" data-i18n="faceFront">Przód</div>
+            <div class="face-rs" data-i18n="faceRight">Bok P</div>
+            <div class="face-back" data-i18n="faceBack">Tył</div>
 
             <div class="empty"></div>
-            <div class="face-bottom">Spód</div>
+            <div class="face-bottom" data-i18n="faceBottom">Spód</div>
             <div class="empty"></div>
             <div class="empty"></div>
           </div>
         </div>
 
         <div class="card">
-          <h3>3. Podsumowanie i Zamówienie</h3>
+          <h3 data-i18n="h3">3. Podsumowanie i Zamówienie</h3>
           <div class="field">
-            <label>Ilość (sztuk)</label>
+            <label data-i18n="qty">Ilość (sztuk)</label>
             <input type="number" id="boxQty" value="100" min="1" step="2" />
           </div>
           <div class="price-line">
-            <span>Cena jedn. (netto)</span>
-            <span id="unitPrice">13.80 zł / szt.</span>
+            <span data-i18n="unitNet">Cena jedn. (netto)</span>
+            <span id="unitPrice"></span>
           </div>
           <div class="total">
-            <span>Razem (netto)</span>
-            <span id="totalPrice">6 900.00</span>
+            <span data-i18n="totalNet">Razem (netto)</span>
+            <span id="totalPrice"></span>
           </div>
-          <button class="btn primary">DODAJ DO KOSZYKA</button>
+          <button class="btn primary" data-i18n="addToCart">
+            DODAJ DO KOSZYKA
+          </button>
         </div>
       </aside>
     </div>
 
     <footer>
       <div class="steps">
-        <span class="step active"><b>1</b>Wymiary</span>
+        <span class="step active"><b>1</b><span data-i18n="step1">Wymiary</span></span>
         <span class="step">›</span>
-        <span class="step"><b>2</b>Projekt</span>
+        <span class="step"><b>2</b><span data-i18n="step2">Projekt</span></span>
         <span class="step">›</span>
-        <span class="step"><b>3</b>Podgląd 3D</span>
+        <span class="step"><b>3</b><span data-i18n="step3">Podgląd 3D</span></span>
         <span class="step">›</span>
-        <span class="step"><b>4</b>Zamówienie</span>
+        <span class="step"><b>4</b><span data-i18n="step4">Zamówienie</span></span>
       </div>
       <div class="actions">
-        <button>? Pomoc</button>
+        <button data-i18n="help">? Pomoc</button>
       </div>
     </footer>
 

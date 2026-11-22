@@ -663,13 +663,14 @@ $("btnReset").addEventListener("click", () => {
   rotateBtn.classList.remove("active");
 });
 
-// ===== Popup pomocy =====
+// ===== 17. Popup pomocy =====
 const helpOverlay = $("helpOverlay");
+const helpCloseBtn = $("helpClose");
 
 function openHelp() {
   helpOverlay.classList.add("active");
   helpOverlay.setAttribute("aria-hidden", "false");
-  $("helpClose").focus();
+  helpCloseBtn.focus();
 }
 
 function closeHelp() {
@@ -678,7 +679,7 @@ function closeHelp() {
 }
 
 $("btnHelp").addEventListener("click", openHelp);
-$("helpClose").addEventListener("click", closeHelp);
+helpCloseBtn.addEventListener("click", closeHelp);
 helpOverlay.addEventListener("click", (e) => {
   if (e.target === helpOverlay) closeHelp();
 });
@@ -686,7 +687,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeHelp();
 });
 
-// ===== 17. Start =====
+// ===== 18. Start =====
 applyLanguage();
 updateUVPreviewLayout();
 

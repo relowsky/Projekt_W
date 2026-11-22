@@ -432,6 +432,7 @@ footer {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 /* ===== Popup pomocy ===== */
 .popup-overlay {
   display: none;

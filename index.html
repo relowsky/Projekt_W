@@ -1,183 +1,200 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PRINTVIEWER 3D</title>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>PRINTVIEWER 3D</title>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-      }
-    </script>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+					"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+				}
+			}
+		</script>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
 
-  <body>
-    <header>
-      <div class="logo">PRINT<span>VIEWER</span> 3D</div>
-      <div class="header-right">
-        <label class="hsel">
-          <span data-i18n="language">Język</span>
-          <select id="langSelect">
-            <option value="pl">PL</option>
-            <option value="en">EN</option>
-            <option value="de">DE</option>
-          </select>
-        </label>
-        <label class="hsel">
-          <span data-i18n="currency">Waluta</span>
-          <select id="currencySelect">
-            <option value="PLN">PLN</option>
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-          </select>
-        </label>
-        <div class="user">👤 <span data-i18n="profile">Profil (Klienta)</span></div>
-      </div>
-    </header>
+	<body>
+		<header>
+			<div class="logo">
+				PRINT<span>VIEWER</span> 3D
+			</div>
+			<div class="header-right">
+				<label class="hsel">
+					<span data-i18n="language">Język</span>
+					<select id="langSelect">
+						<option value="pl">PL</option>
+						<option value="en">EN</option>
+						<option value="de">DE</option>
+					</select>
+				</label>
+				<label class="hsel">
+					<span data-i18n="currency">Waluta</span>
+					<select id="currencySelect">
+						<option value="PLN">PLN</option>
+						<option value="EUR">EUR</option>
+						<option value="USD">USD</option>
+					</select>
+				</label>
+				<div class="user">
+					👤 <span data-i18n="profile">Profil (Klienta)</span>
+				</div>
+			</div>
+		</header>
 
-    <div class="main" id="main">
-      <nav class="sidebar">
-        <button class="active" data-tab="box" data-i18n-title="tabBox">📦</button>
-        <button data-tab="graphics" data-i18n-title="tabGraphics">🖼️</button>
-        <button data-tab="templates" data-i18n-title="tabTemplates">📐</button>
-        <button data-tab="materials" data-i18n-title="tabMaterials">🎨</button>
-        <button data-tab="orders" data-i18n-title="tabOrders">🛒</button>
-        <button data-tab="settings" data-i18n-title="tabSettings">⚙️</button>
-      </nav>
+		<div class="main" id="main">
+			<nav class="sidebar">
+				<button class="active" data-tab="box" data-i18n-title="tabBox">📦</button>
+				<button data-tab="graphics" data-i18n-title="tabGraphics">🖼️</button>
+				<button data-tab="templates" data-i18n-title="tabTemplates">📐</button>
+				<button data-tab="materials" data-i18n-title="tabMaterials">🎨</button>
+				<button data-tab="orders" data-i18n-title="tabOrders">🛒</button>
+				<button data-tab="settings" data-i18n-title="tabSettings">⚙️</button>
+			</nav>
 
-      <section class="viewer" id="viewerSection">
-        <div class="viewport" id="viewport">
-          <div class="toolbar-top">
-            <button class="chip" id="btnRotate">
-              🔄 <span data-i18n="autoRotate">Auto-Obrót</span>
-            </button>
-            <button class="chip" id="btnReset">
-              ↺ <span data-i18n="resetView">Reset Widoku</span>
-            </button>
-          </div>
+			<section class="viewer" id="viewerSection">
+				<div class="viewport" id="viewport">
+					<div class="toolbar-top">
+						<button class="chip" id="btnRotate">
+							🔄 <span data-i18n="autoRotate">Auto-Obrót</span>
+						</button>
+						<button class="chip" id="btnReset">
+							↺ <span data-i18n="resetView">Reset Widoku</span>
+						</button>
+					</div>
 
-          <div class="zoom">
-            <button class="chip" id="btnPlus">+</button>
-            <button class="chip" id="btnMinus">−</button>
-          </div>
-        </div>
-      </section>
+					<div class="zoom">
+						<button class="chip" id="btnPlus">+</button>
+						<button class="chip" id="btnMinus">−</button>
+					</div>
+				</div>
+			</section>
 
-      <section class="templates" id="templatesSection">
-        <div class="templates-grid" id="templatesGrid"></div>
-      </section>
+			<section class="templates" id="templatesSection">
+				<div class="templates-grid" id="templatesGrid"></div>
+			</section>
 
-      <aside class="panel" id="panel">
-        <div class="card">
-          <h3 data-i18n="h1">1. Wymiary Pudełka (zewnętrzne)</h3>
-          <div class="row">
-            <div class="field">
-              <label data-i18n="length">Długość (mm)</label>
-              <input type="number" id="boxLength" value="320" min="30" step="10" />
-            </div>
-            <div class="field">
-              <label data-i18n="width">Szerokość (mm)</label>
-              <input type="number" id="boxWidth" value="230" min="30" step="10" />
-            </div>
-            <div class="field">
-              <label data-i18n="depth">Głębokość (mm)</label>
-              <input type="number" id="boxDepth" value="100" min="30" step="10" />
-            </div>
-          </div>
-          <div class="field">
-            <label data-i18n="material">Materiał</label>
-            <select id="boxMaterial">
-              <option value="0" data-i18n="mat0">Tektura Fala E (Cienka)</option>
-              <option value="1" data-i18n="mat1">Tektura Fala B (Gruba)</option>
-              <option value="2" data-i18n="mat2">Papier Kraft (Brązowy)</option>
-            </select>
-          </div>
-        </div>
+			<aside class="panel" id="panel">
+				<div class="card">
+					<h3 data-i18n="h1">1. Wymiary Pudełka (zewnętrzne)</h3>
+					<div class="row">
+						<div class="field">
+							<label data-i18n="length">Długość (mm)</label>
+							<input type="number" id="boxLength" value="320" min="30" step="10" />
+						</div>
+						<div class="field">
+							<label data-i18n="width">Szerokość (mm)</label>
+							<input type="number" id="boxWidth" value="230" min="30" step="10" />
+						</div>
+						<div class="field">
+							<label data-i18n="depth">Głębokość (mm)</label>
+							<input type="number" id="boxDepth" value="100" min="30" step="10" />
+						</div>
+					</div>
+					<div class="field">
+						<label data-i18n="material">Materiał</label>
+						<select id="boxMaterial">
+							<option value="0" data-i18n="mat0">Tektura Fala E (Cienka)</option>
+							<option value="1" data-i18n="mat1">Tektura Fala B (Gruba)</option>
+							<option value="2" data-i18n="mat2">Papier Kraft (Brązowy)</option>
+						</select>
+					</div>
+				</div>
 
-        <div class="finish-switch">
-          <button class="finish-btn active" id="finishMatte" data-i18n="matte">
-            Matowe
-          </button>
-          <button class="finish-btn" id="finishGlossy" data-i18n="glossy">
-            Błyszczące
-          </button>
-        </div>
+				<div class="finish-switch">
+					<button class="finish-btn active" id="finishMatte" data-i18n="matte">
+						Matowe
+					</button>
+					<button class="finish-btn" id="finishGlossy" data-i18n="glossy">
+						Błyszczące
+					</button>
+				</div>
 
-        <div class="card">
-          <h3 data-i18n="h2">2. Projekt i Grafika</h3>
-          <button class="btn" id="btnUpload" data-i18n="upload">
-            ⬆ Wgraj Własną Grafikę
-          </button>
-          <button class="btn success" id="btnDownloadUV" data-i18n="download">
-            💾 Pobierz Siatkę UV (.png)
-          </button>
+				<div class="card">
+					<h3 data-i18n="h2">2. Projekt i Grafika</h3>
+					<button class="btn" id="btnUpload" data-i18n="upload">
+						⬆ Wgraj Własną Grafikę
+					</button>
+					<button class="btn success" id="btnDownloadUV" data-i18n="download">
+						💾 Pobierz Siatkę UV (.png)
+					</button>
 
-          <h3
-            style="margin-top: 14px; font-size: 13px; color: #9aa3b5"
-            data-i18n="uvPreview"
-          >
-            Podgląd Siatki UV w panelu
-          </h3>
-          <div class="uv" id="uvPreview">
-            <div class="empty"></div>
-            <div class="face-top" data-i18n="faceTop">Góra</div>
-            <div class="empty"></div>
-            <div class="empty"></div>
+					<h3
+						style="margin-top: 14px; font-size: 13px; color: #9aa3b5"
+						data-i18n="uvPreview"
+					>
+						Podgląd Siatki UV w panelu
+					</h3>
+					<div class="uv" id="uvPreview">
+						<div class="empty"></div>
+						<div class="face-top" data-i18n="faceTop">Góra</div>
+						<div class="empty"></div>
+						<div class="empty"></div>
 
-            <div class="face-ls" data-i18n="faceLeft">Bok L</div>
-            <div class="face-front" data-i18n="faceFront">Przód</div>
-            <div class="face-rs" data-i18n="faceRight">Bok P</div>
-            <div class="face-back" data-i18n="faceBack">Tył</div>
+						<div class="face-ls" data-i18n="faceLeft">Bok L</div>
+						<div class="face-front" data-i18n="faceFront">Przód</div>
+						<div class="face-rs" data-i18n="faceRight">Bok P</div>
+						<div class="face-back" data-i18n="faceBack">Tył</div>
 
-            <div class="empty"></div>
-            <div class="face-bottom" data-i18n="faceBottom">Spód</div>
-            <div class="empty"></div>
-            <div class="empty"></div>
-          </div>
-        </div>
+						<div class="empty"></div>
+						<div class="face-bottom" data-i18n="faceBottom">Spód</div>
+						<div class="empty"></div>
+						<div class="empty"></div>
+					</div>
+				</div>
 
-        <div class="card">
-          <h3 data-i18n="h3">3. Podsumowanie i Zamówienie</h3>
-          <div class="field">
-            <label data-i18n="qty">Ilość (sztuk)</label>
-            <input type="number" id="boxQty" value="100" min="1" step="2" />
-          </div>
-          <div class="price-line">
-            <span data-i18n="unitNet">Cena jedn. (netto)</span>
-            <span id="unitPrice"></span>
-          </div>
-          <div class="total">
-            <span data-i18n="totalNet">Razem (netto)</span>
-            <span id="totalPrice"></span>
-          </div>
-          <button class="btn primary" data-i18n="addToCart">
-            DODAJ DO KOSZYKA
-          </button>
-        </div>
-      </aside>
-    </div>
+				<div class="card">
+					<h3 data-i18n="h3">3. Podsumowanie i Zamówienie</h3>
+					<div class="field">
+						<label data-i18n="qty">Ilość (sztuk)</label>
+						<input type="number" id="boxQty" value="100" min="1" step="2" />
+					</div>
+					<div class="price-line">
+						<span data-i18n="unitNet">Cena jedn. (netto)</span>
+						<span id="unitPrice"></span>
+					</div>
+					<div class="total">
+						<span data-i18n="totalNet">Razem (netto)</span>
+						<span id="totalPrice"></span>
+					</div>
+					<button class="btn primary" data-i18n="addToCart">
+						DODAJ DO KOSZYKA
+					</button>
+				</div>
+			</aside>
+		</div>
 
-    <footer>
-      <div class="steps">
-        <span class="step active"><b>1</b><span data-i18n="step1">Wymiary</span></span>
-        <span class="step">›</span>
-        <span class="step"><b>2</b><span data-i18n="step2">Projekt</span></span>
-        <span class="step">›</span>
-        <span class="step"><b>3</b><span data-i18n="step3">Podgląd 3D</span></span>
-        <span class="step">›</span>
-        <span class="step"><b>4</b><span data-i18n="step4">Zamówienie</span></span>
-      </div>
-      <div class="actions">
-        <button id="btnHelp" data-i18n="help">? Pomoc</button>
-      </div>
-    </footer>
+		<footer>
+			<div class="steps">
+				<span class="step active">
+					<b>1</b>
+					<span data-i18n="step1">Wymiary</span>
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>2</b>
+					<span data-i18n="step2">Projekt</span>
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>3</b>
+					<span data-i18n="step3">Podgląd 3D</span>
+				</span>
+				<span class="step">›</span>
+				<span class="step">
+					<b>4</b>
+					<span data-i18n="step4">Zamówienie</span>
+				</span>
+			</div>
+			<div class="actions">
+				<button id="btnHelp" data-i18n="help">? Pomoc</button>
+			</div>
+		</footer>
 
-    <div id="helpOverlay" class="popup-overlay" aria-hidden="true">
+		<!-- Popup pomocy -->
+		<div id="helpOverlay" class="popup-overlay" aria-hidden="true">
 			<div
 				class="popup"
 				role="dialog"
@@ -185,13 +202,11 @@
 				aria-labelledby="helpTitle"
 			>
 				<h2 id="helpTitle" data-i18n="helpTitle">Informacja</h2>
-				<p data-i18n="helpText">
-					To jest wersja testowa aplikacji.
-				</p>
+				<p data-i18n="helpText">To jest wersja testowa aplikacji.</p>
 				<button type="button" id="helpClose" data-i18n="close">Zamknij</button>
 			</div>
 		</div>
 
 		<script type="module" src="js/main.js"></script>
-  </body>
+	</body>
 </html>

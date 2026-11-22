@@ -654,6 +654,29 @@ $("btnReset").addEventListener("click", () => {
   rotateBtn.classList.remove("active");
 });
 
+// ===== Popup pomocy =====
+const helpOverlay = $("helpOverlay");
+
+function openHelp() {
+  helpOverlay.classList.add("active");
+  helpOverlay.setAttribute("aria-hidden", "false");
+  $("helpClose").focus();
+}
+
+function closeHelp() {
+  helpOverlay.classList.remove("active");
+  helpOverlay.setAttribute("aria-hidden", "true");
+}
+
+$("btnHelp").addEventListener("click", openHelp);
+$("helpClose").addEventListener("click", closeHelp);
+helpOverlay.addEventListener("click", (e) => {
+  if (e.target === helpOverlay) closeHelp();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeHelp();
+});
+
 // ===== 17. Start =====
 applyLanguage();
 updateUVPreviewLayout();

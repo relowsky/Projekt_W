@@ -87,6 +87,9 @@ const i18n = {
     step3: "Podgląd 3D",
     step4: "Zamówienie",
     help: "? Pomoc",
+    helpTitle: "Informacja",
+    helpText: "To jest wersja testowa aplikacji.",
+    close: "Zamknij",
   },
   en: {
     language: "Language",
@@ -131,6 +134,9 @@ const i18n = {
     step3: "3D Preview",
     step4: "Order",
     help: "? Help",
+    helpTitle: "Information",
+    helpText: "This is a test version of the application.",
+    close: "Close",
   },
   de: {
     language: "Sprache",
@@ -175,6 +181,9 @@ const i18n = {
     step3: "3D-Vorschau",
     step4: "Bestellung",
     help: "? Hilfe",
+    helpTitle: "Information",
+    helpText: "Dies ist eine Testversion der Anwendung.",
+    close: "Schließen",
   },
 };
 

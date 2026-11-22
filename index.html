@@ -173,10 +173,25 @@
         <span class="step"><b>4</b><span data-i18n="step4">Zamówienie</span></span>
       </div>
       <div class="actions">
-        <button data-i18n="help">? Pomoc</button>
+        <button id="btnHelp" data-i18n="help">? Pomoc</button>
       </div>
     </footer>
 
-    <script type="module" src="js/main.js"></script>
+    <div id="helpOverlay" class="popup-overlay" aria-hidden="true">
+			<div
+				class="popup"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="helpTitle"
+			>
+				<h2 id="helpTitle" data-i18n="helpTitle">Informacja</h2>
+				<p data-i18n="helpText">
+					To jest wersja testowa aplikacji.
+				</p>
+				<button type="button" id="helpClose" data-i18n="close">Zamknij</button>
+			</div>
+		</div>
+
+		<script type="module" src="js/main.js"></script>
   </body>
 </html>

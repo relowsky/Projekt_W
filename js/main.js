@@ -98,6 +98,8 @@ const i18n = {
     foilSilver: "Srebro",
     foilRose: "Różowe złoto",
     foilFrame: "Złota ramka wokół okienka",
+    foilMapDl: "Pobierz mapę złocenia (.png)",
+    foilNone: "Najpierw włącz złocenie.",
     hDesign: "Projekt i grafika",
     downloadT: "Pobierz wzór",
     uploadT: "Wgraj własny projekt",
@@ -172,6 +174,8 @@ const i18n = {
     foilSilver: "Silver",
     foilRose: "Rose gold",
     foilFrame: "Foil frame around window",
+    foilMapDl: "Download foil map (.png)",
+    foilNone: "Enable foil stamping first.",
     hDesign: "Design & artwork",
     downloadT: "Download template",
     uploadT: "Upload your design",
@@ -246,6 +250,8 @@ const i18n = {
     foilSilver: "Silber",
     foilRose: "Roségold",
     foilFrame: "Folienrahmen ums Fenster",
+    foilMapDl: "Folienkarte herunterladen (.png)",
+    foilNone: "Aktivieren Sie zuerst die Folienprägung.",
     hDesign: "Design & Grafik",
     downloadT: "Vorlage herunterladen",
     uploadT: "Eigenes Design hochladen",
@@ -370,7 +376,30 @@ function windowPath(ctx, win, rects, s, grow = 0) {
   }
 }
 
-// Maluje 3 mapy: kolor, alfa (dziury) i ORM (G = roughness, B = metalness)
+// Rysuje kształty złocenia aktualnym fillStyle / strokeStyle
+function drawFoilShapes(ctx, layout, s, win, foil) {
+  const [x, y, w, h] = layout.rects[foil.face];
+  if (foil.text) {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    let fs = h * s * (foil.size / 100);
+    ctx.font = `700 ${fs}px sans-serif`;
+    const maxW = w * s * 0.9;
+    const mw = ctx.measureText(foil.text).width;
+    if (mw > maxW) {
+      fs *= maxW / mw;
+      ctx.font = `700 ${fs}px sans-serif`;
+    }
+    ctx.fillText(foil.text, (x + w / 2) * s, (y + h / 2) * s);
+  }
+  if (foil.frame && win.enabled) {
+    ctx.lineWidth = 2.5 * s;
+    windowPath(ctx, win, layout.rects, s, 4);
+    ctx.stroke();
+  }
+}
+
+// Maluje mapy: kolor, alfa (dziury), ORM (G = roughness, B = metalness), szybka
 function paintSurface(layout) {
   const { TW, TH, rects } = layout;
   const s = Math.min(8, 2048 / TW);
@@ -388,6 +417,8 @@ function paintSurface(layout) {
   const c = color.getContext("2d");
   const a = alpha.getContext("2d");
   const o = orm.getContext("2d");
+  const glass = mk();
+  const g = glass.getContext("2d");
 
   c.fillStyle = baseColors[parseInt(materialSelect.value) || 0];
   c.fillRect(0, 0, cw, ch);
@@ -396,6 +427,8 @@ function paintSurface(layout) {
   a.fillRect(0, 0, cw, ch);
   o.fillStyle = "rgb(255,255,0)"; // matowy, niemetaliczny
   o.fillRect(0, 0, cw, ch);
+  g.fillStyle = "#000";
+  g.fillRect(0, 0, cw, ch);
 
   const win = getWindow();
   const foil = getFoil();
@@ -405,46 +438,25 @@ function paintSurface(layout) {
     foilPalettes[foil.color].forEach((col, i, arr) =>
       grad.addColorStop(i / (arr.length - 1), col)
     );
-    const drawFoil = (draw) => {
-      c.fillStyle = c.strokeStyle = grad;
-      o.fillStyle = o.strokeStyle = "rgb(255,70,255)"; // gładki metal
-      draw(c);
-      draw(o);
-    };
-
-    if (foil.text) {
-      const [x, y, w, h] = rects[foil.face];
-      drawFoil((ctx) => {
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        let fs = h * s * (foil.size / 100);
-        ctx.font = `700 ${fs}px sans-serif`;
-        const maxW = w * s * 0.9;
-        const mw = ctx.measureText(foil.text).width;
-        if (mw > maxW) {
-          fs *= maxW / mw;
-          ctx.font = `700 ${fs}px sans-serif`;
-        }
-        ctx.fillText(foil.text, (x + w / 2) * s, (y + h / 2) * s);
-      });
-    }
-
-    if (foil.frame && win.enabled) {
-      drawFoil((ctx) => {
-        ctx.lineWidth = 2.5 * s;
-        windowPath(ctx, win, rects, s, 4);
-        ctx.stroke();
-      });
-    }
+    c.fillStyle = c.strokeStyle = grad;
+    drawFoilShapes(c, layout, s, win, foil);
+    o.fillStyle = o.strokeStyle = "rgb(255,70,255)"; // gładki metal
+    drawFoilShapes(o, layout, s, win, foil);
   }
 
+  const hasGlass = win.enabled && win.film;
   if (win.enabled) {
     a.fillStyle = "#000"; // dziura
     windowPath(a, win, rects, s);
     a.fill();
   }
+  if (hasGlass) {
+    g.fillStyle = "#fff"; // tu będzie szybka
+    windowPath(g, win, rects, s);
+    g.fill();
+  }
 
-  return { color, alpha, orm };
+  return { color, alpha, orm, glass, hasGlass };
 }
 
 // ===== 6. Rysowanie siatki (UV, pobieranie, szablony) =====
@@ -618,6 +630,11 @@ function refreshAll() {
   if (viewMode === "uv") drawUVView(layout, surface);
 }
 
+// Okienko od razu na górze (musi odpalić przed refreshAll)
+winEnabled.addEventListener("input", () => {
+  if (winEnabled.checked) $("winFace").value = "top";
+});
+
 const extraIds = [
   "edgeRadius", "winEnabled", "winFace", "winShape", "winW", "winH", "winX",
   "winY", "winR", "winFilm", "foilEnabled", "foilText", "foilFace",
@@ -677,6 +694,28 @@ $("btnDownloadUV").addEventListener("click", () => {
   });
   const link = document.createElement("a");
   link.download = `wzor-${L}x${W}x${H}mm.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
+
+// ===== 12b. Pobieranie mapy złocenia =====
+$("btnDownloadFoil").addEventListener("click", () => {
+  const foil = getFoil();
+  if (!foil.enabled) {
+    openPopup(t("helpTitle"), t("foilNone"));
+    return;
+  }
+  const layout = getNetLayout();
+  const { L, W, H, TW, TH } = layout;
+  const scale = 10;
+  const canvas = document.createElement("canvas");
+  canvas.width = TW * scale;
+  canvas.height = TH * scale;
+  const ctx = canvas.getContext("2d"); // tło zostaje przezroczyste
+  ctx.fillStyle = ctx.strokeStyle = "#000"; // czarne = złocone
+  drawFoilShapes(ctx, layout, scale, getWindow(), foil);
+  const link = document.createElement("a");
+  link.download = `zlocenie-${L}x${W}x${H}mm.png`;
   link.href = canvas.toDataURL("image/png");
   link.click();
 });
@@ -821,6 +860,22 @@ async function init3D() {
   scene.add(mesh);
   let edges = null;
 
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xb9c4cc, // lekko przyciemniony plastik
+    transmission: 1,
+    thickness: 0.05,
+    ior: 1.45,
+    roughness: 0.04,
+    clearcoat: 1,
+    clearcoatRoughness: 0.02,
+    envMapIntensity: 1.6,
+    side: THREE.DoubleSide,
+    alphaTest: 0.5, // tylko w obrysie okienka
+  });
+  const glassMesh = new THREE.Mesh(mesh.geometry, glassMat);
+  glassMesh.visible = false;
+  scene.add(glassMesh);
+
   function onResize() {
     const w = viewport.clientWidth;
     const h = viewport.clientHeight;
@@ -869,6 +924,7 @@ async function init3D() {
         ? new RoundedBoxGeometry(sx, sy, sz, 5, r)
         : new THREE.BoxGeometry(sx, sy, sz);
     mapUV(mesh.geometry, sx, sy, sz, layout);
+    glassMesh.geometry = mesh.geometry;
 
     if (edges) {
       mesh.remove(edges);
@@ -888,10 +944,12 @@ async function init3D() {
     }
   }
 
-  function setSurface({ color, alpha, orm }) {
+  function setSurface({ color, alpha, orm, glass, hasGlass }) {
     ["map", "alphaMap", "metalnessMap", "roughnessMap"].forEach((k) => {
       if (material[k]) material[k].dispose();
     });
+    if (glassMat.alphaMap) glassMat.alphaMap.dispose();
+
     const colorTex = new THREE.CanvasTexture(color);
     colorTex.colorSpace = THREE.SRGBColorSpace;
     const ormTex = new THREE.CanvasTexture(orm);
@@ -902,6 +960,10 @@ async function init3D() {
     material.roughnessMap = ormTex;
     material.metalness = 1;
     material.needsUpdate = true;
+
+    glassMat.alphaMap = new THREE.CanvasTexture(glass);
+    glassMesh.visible = hasGlass;
+    glassMat.needsUpdate = true;
   }
 
   function setFinish(finish) {

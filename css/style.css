@@ -493,6 +493,20 @@ button {
 .btn-primary:hover {
   filter: brightness(1.08);
 }
+.btn-secondary {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
 
 /* ===== Szablony ===== */
 .templates {

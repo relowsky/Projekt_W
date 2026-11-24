@@ -101,9 +101,13 @@
               <button id="btnViewUV">UV</button>
             </div>
 
-            <div class="gizmo"><canvas id="gizmo" width="88" height="88"></canvas></div>
+            <div class="gizmo">
+              <canvas id="gizmo" width="88" height="88"></canvas>
+            </div>
 
-            <div class="hint">🖱 <span data-i18n="hint">Obracaj, przybliżaj i przesuwaj model</span></div>
+            <div class="hint">
+              🖱 <span data-i18n="hint">Obracaj, przybliżaj i przesuwaj model</span>
+            </div>
 
             <div class="vp-actions">
               <button class="round" id="btnRotate" data-i18n-title="autoRotate">🔄</button>
@@ -219,7 +223,7 @@
               </div>
             </div>
             <label class="check">
-              <input type="checkbox" id="winFilm" />
+              <input type="checkbox" id="winFilm" checked />
               <span data-i18n="winFilm">Folia okienkowa (PET)</span>
             </label>
           </div>
@@ -266,6 +270,9 @@
               <input type="checkbox" id="foilFrame" />
               <span data-i18n="foilFrame">Złota ramka wokół okienka</span>
             </label>
+            <button class="btn-secondary" id="btnDownloadFoil" type="button">
+              <span data-i18n="foilMapDl">Pobierz mapę złocenia (.png)</span>
+            </button>
           </div>
         </section>
 

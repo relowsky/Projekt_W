@@ -834,7 +834,7 @@ async function init3D() {
   camera.position.copy(defaultCameraPos);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.domElement.id = "glCanvas";
   viewport.prepend(renderer.domElement);
 
@@ -847,28 +847,9 @@ async function init3D() {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.enableZoom = false;
+  controls.minDistance = 2;
+  controls.maxDistance = 15;
   controls.autoRotateSpeed = 2;
-
-  const MIN_DIST = 2;
-  const MAX_DIST = 15;
-  renderer.domElement.addEventListener(
-    "wheel",
-    (e) => {
-      e.preventDefault();
-      const delta = clamp(e.deltaY, -100, 100);
-      const offset = camera.position.clone().sub(controls.target);
-      const dist = clamp(
-        offset.length() * Math.exp(delta * 0.001),
-        MIN_DIST,
-        MAX_DIST
-      );
-      offset.setLength(dist);
-      camera.position.copy(controls.target).add(offset);
-    },
-    { passive: false }
-  );
 
   const material = new THREE.MeshPhysicalMaterial({
     color: 0xe6dccb,
@@ -880,16 +861,16 @@ async function init3D() {
   let edges = null;
 
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color: 0xdfe8ee,
-    transparent: true,
-    opacity: 0.25,
+    color: 0xb9c4cc, // lekko przyciemniony plastik
+    transmission: 1,
+    thickness: 0.05,
+    ior: 1.45,
     roughness: 0.04,
     clearcoat: 1,
     clearcoatRoughness: 0.02,
     envMapIntensity: 1.6,
     side: THREE.DoubleSide,
-    depthWrite: false,
-    alphaTest: 0.5,
+    alphaTest: 0.5, // tylko w obrysie okienka
   });
   const glassMesh = new THREE.Mesh(mesh.geometry, glassMat);
   glassMesh.visible = false;

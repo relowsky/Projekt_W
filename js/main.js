@@ -678,7 +678,7 @@ const extraIds = [
   "edgeRadius", "winEnabled", "winFace", "winShape", "winW", "winH", "winX",
   "winY", "winR", "winFilm", "foilEnabled", "foilText", "foilFace",
   "foilColor", "foilSize", "foilFrame", "boxLength", "boxWidth", "boxDepth",
-  "boxMaterial", "boxQty",
+  "boxMaterial", "boxQty", "boxType",
 ];
 extraIds.forEach((id) => $(id).addEventListener("input", refreshAll));
 
@@ -969,6 +969,15 @@ async function init3D() {
   const glassMesh = new THREE.Mesh(mesh.geometry, glassMat);
   glassMesh.visible = false;
   scene.add(glassMesh);
+  const { createFasonBox } = await import("./fasonBox.js");
+  const fasonMat = new THREE.MeshStandardMaterial({
+    roughness: 0.95,
+    metalness: 0,
+  });
+  const fason = createFasonBox(THREE, fasonMat);
+  scene.add(fason.group);
+  let lidCur = 100;
+  let lidTarget = 100;
 
   function onResize() {
     const w = viewport.clientWidth;
@@ -1007,6 +1016,18 @@ async function init3D() {
   }
 
   function updateBox(layout, edgeMm = 0) {
+    const isFason = $("boxType").value === "fason";
+    mesh.visible = !isFason;
+    fason.group.visible = isFason;
+    if (isFason) {
+      const { L, W, H } = layout;
+      const k = 3 / Math.max(L, W, H);
+      const tMm = [1.5, 3, 1][parseInt(materialSelect.value) || 0];
+      fasonMat.color.set(baseColors[parseInt(materialSelect.value) || 0]);
+      fason.build({ L, W, H }, tMm, lidCur);
+      fason.group.position.y = -(H * k) / 2;
+      return;
+    }
     const { L, W, H } = layout;
     const k = 3 / Math.max(L, W, H);
     const sx = L * k, sy = H * k, sz = W * k;
@@ -1056,7 +1077,7 @@ async function init3D() {
     material.needsUpdate = true;
 
     glassMat.alphaMap = new THREE.CanvasTexture(glass);
-    glassMesh.visible = hasGlass;
+    glassMesh.visible = hasGlass && !fason.group.visible;
     glassMat.needsUpdate = true;
   }
 
@@ -1121,11 +1142,19 @@ async function init3D() {
   (function animate() {
     requestAnimationFrame(animate);
     controls.update();
+    if (fason.group.visible && Math.abs(lidTarget - lidCur) > 0.1) {
+      lidCur += (lidTarget - lidCur) * 0.12;
+      fason.setOpen(lidCur);
+    }
     renderer.render(scene, camera);
     drawGizmo();
   })();
 
-  return { updateBox, setSurface, setFinish, toggleRotate, resetView };
+  function toggleLid() {
+    lidTarget = lidTarget > 0 ? 0 : 100;
+  }
+
+  return { updateBox, setSurface, setFinish, toggleRotate, resetView, toggleLid };
 }
 
 rotateBtn.addEventListener("click", () => {
@@ -1137,6 +1166,7 @@ $("btnReset").addEventListener("click", () => {
   viewer.resetView();
   rotateBtn.classList.remove("active");
 });
+$("btnLid").addEventListener("click", () => viewer && viewer.toggleLid());
 
 // ===== 18. Start =====
 applyTheme();

@@ -869,6 +869,13 @@ navButtons.forEach((b) =>
   b.addEventListener("click", () => switchTab(b.dataset.tab))
 );
 
+// ===== 15b. Zwijanie kart =====
+document.querySelectorAll(".card h3").forEach((h) => {
+  h.addEventListener("click", () =>
+    h.parentElement.classList.toggle("collapsed")
+  );
+});
+
 // ===== 16. Szablony =====
 function renderTemplates() {
   templatesGrid.innerHTML = "";

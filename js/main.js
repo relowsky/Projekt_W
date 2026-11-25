@@ -848,10 +848,27 @@ async function init3D() {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.zoomSpeed = 0.6;
-  controls.minDistance = 3;
-  controls.maxDistance = 12;
+  controls.enableZoom = false;
   controls.autoRotateSpeed = 2;
+
+  const MIN_DIST = 2;
+  const MAX_DIST = 15;
+  renderer.domElement.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      const delta = clamp(e.deltaY, -100, 100);
+      const offset = camera.position.clone().sub(controls.target);
+      const dist = clamp(
+        offset.length() * Math.exp(delta * 0.001),
+        MIN_DIST,
+        MAX_DIST
+      );
+      offset.setLength(dist);
+      camera.position.copy(controls.target).add(offset);
+    },
+    { passive: false }
+  );
 
   const material = new THREE.MeshPhysicalMaterial({
     color: 0xe6dccb,

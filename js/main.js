@@ -34,6 +34,8 @@ const foilPalettes = {
 
 let currentFinish = "matte";
 let artwork = null;
+let foilArtwork = null;
+let foilArtworkUrl = null;
 let uploadedImageUrl = null;
 let viewMode = "3d";
 let currentLang = localStorage.getItem("lang") || "pl";
@@ -399,6 +401,29 @@ function drawFoilShapes(ctx, layout, s, win, foil) {
   }
 }
 
+// Zamienia obrazek na maskę: czarne/nieprzezroczyste = złocenie
+let maskCache = { img: null, w: 0, h: 0, canvas: null };
+function makeFoilMask(img, w, h) {
+  if (maskCache.img === img && maskCache.w === w && maskCache.h === h) {
+    return maskCache.canvas;
+  }
+  const cv = document.createElement("canvas");
+  cv.width = w;
+  cv.height = h;
+  const ctx = cv.getContext("2d");
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h);
+  const p = d.data;
+  for (let i = 0; i < p.length; i += 4) {
+    const lum = (0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]) / 255;
+    p[i] = p[i + 1] = p[i + 2] = 0;
+    p[i + 3] = Math.round(p[i + 3] * (1 - lum));
+  }
+  ctx.putImageData(d, 0, 0);
+  maskCache = { img, w, h, canvas: cv };
+  return cv;
+}
+
 // Maluje mapy: kolor, alfa (dziury), ORM (G = roughness, B = metalness), szybka
 function paintSurface(layout) {
   const { TW, TH, rects } = layout;
@@ -442,6 +467,20 @@ function paintSurface(layout) {
     drawFoilShapes(c, layout, s, win, foil);
     o.fillStyle = o.strokeStyle = "rgb(255,70,255)"; // gładki metal
     drawFoilShapes(o, layout, s, win, foil);
+    if (foilArtwork && foilArtwork.complete) {
+      const mask = makeFoilMask(foilArtwork, cw, ch);
+      const tint = (fill) => {
+        const tmp = mk();
+        const tc = tmp.getContext("2d");
+        tc.fillStyle = fill;
+        tc.fillRect(0, 0, cw, ch);
+        tc.globalCompositeOperation = "destination-in";
+        tc.drawImage(mask, 0, 0);
+        return tmp;
+      };
+      c.drawImage(tint(grad), 0, 0);
+      o.drawImage(tint("rgb(255,70,255)"), 0, 0);
+    }
   }
 
   const hasGlass = win.enabled && win.film;
@@ -670,6 +709,33 @@ fileInput.addEventListener("change", (e) => {
   artwork = new Image();
   artwork.onload = refreshAll;
   artwork.src = uploadedImageUrl;
+});
+
+// ===== 11b. Wgrywanie grafiki złocenia =====
+const foilFileInput = document.createElement("input");
+foilFileInput.type = "file";
+foilFileInput.accept = "image/*";
+foilFileInput.style.display = "none";
+document.body.appendChild(foilFileInput);
+
+$("btnFoilUpload").addEventListener("click", () => foilFileInput.click());
+foilFileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (foilArtworkUrl) URL.revokeObjectURL(foilArtworkUrl);
+  foilArtworkUrl = URL.createObjectURL(file);
+  foilArtwork = new Image();
+  foilArtwork.onload = () => {
+    $("btnFoilClear").hidden = false;
+    refreshAll();
+  };
+  foilArtwork.src = foilArtworkUrl;
+  foilFileInput.value = "";
+});
+$("btnFoilClear").addEventListener("click", () => {
+  foilArtwork = null;
+  $("btnFoilClear").hidden = true;
+  refreshAll();
 });
 
 // ===== 12. Pobieranie wzoru =====

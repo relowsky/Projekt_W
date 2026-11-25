@@ -698,6 +698,18 @@ $("btnDownloadUV").addEventListener("click", () => {
   link.click();
 });
 
+// Linie zgnieceń – czarne, przerywane
+function drawCreaseLines(ctx, layout, s, lw = 2) {
+  ctx.save();
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = lw;
+  ctx.setLineDash([lw * 6, lw * 4]);
+  for (const [x, y, w, h] of Object.values(layout.rects)) {
+    ctx.strokeRect(x * s, y * s, w * s, h * s);
+  }
+  ctx.restore();
+}
+
 // ===== 12b. Pobieranie mapy złocenia =====
 $("btnDownloadFoil").addEventListener("click", () => {
   const foil = getFoil();
@@ -711,9 +723,18 @@ $("btnDownloadFoil").addEventListener("click", () => {
   const canvas = document.createElement("canvas");
   canvas.width = TW * scale;
   canvas.height = TH * scale;
-  const ctx = canvas.getContext("2d"); // tło zostaje przezroczyste
+  const ctx = canvas.getContext("2d"); // tło przezroczyste
+
+  drawCreaseLines(ctx, layout, scale, 2); // linie zgnieceń
+
   ctx.fillStyle = ctx.strokeStyle = "#000"; // czarne = złocone
   drawFoilShapes(ctx, layout, scale, getWindow(), foil);
+
+  // wgrana grafika złocenia
+  if (foilArtwork && foilArtwork.complete) {
+    ctx.drawImage(makeFoilMask(foilArtwork, canvas.width, canvas.height), 0, 0);
+  }
+
   const link = document.createElement("a");
   link.download = `zlocenie-${L}x${W}x${H}mm.png`;
   link.href = canvas.toDataURL("image/png");

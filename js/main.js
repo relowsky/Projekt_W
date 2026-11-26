@@ -24,13 +24,35 @@ const fixedSetupCost = 2.0;
 const glossyExtraCharge = 0.1;
 const currencyRates = { PLN: 4.0, EUR: 0.92, USD: 1 };
 const locales = { pl: "pl-PL", en: "en-GB", de: "de-DE" };
-
 const baseColors = ["#e9e1d2", "#d8c8a6", "#b88a5a"];
 const foilPalettes = {
   gold: ["#fff1b8", "#d4a82a", "#8a6414", "#f5d76e"],
   silver: ["#ffffff", "#b8bcc4", "#6e737c", "#e8eaee"],
   rose: ["#ffe0d6", "#d99a86", "#8f5546", "#f1c0b0"],
 };
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (v) =>
+    Math.round(clamp(amt >= 0 ? v + (255 - v) * amt : v * (1 + amt), 0, 255));
+  const r = f((n >> 16) & 255);
+  const g = f((n >> 8) & 255);
+  const b = f(n & 255);
+  return `rgb(${r},${g},${b})`;
+}
+function metalPalette(hex) {
+  return [shade(hex, 0.6), hex, shade(hex, -0.4), shade(hex, 0.35)];
+}
+const pantoneFoils = {
+  p871: "#85754E",
+  p874: "#8B6914",
+  p123: "#FFC72C",
+  p1235: "#FFB81C",
+  p7752: "#C6A900",
+  p459: "#E8D48B",
+};
+Object.entries(pantoneFoils).forEach(([k, hex]) => {
+  foilPalettes[k] = metalPalette(hex);
+});
 
 let currentFinish = "matte";
 let artwork = null;
